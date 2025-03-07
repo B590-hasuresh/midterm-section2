@@ -1,0 +1,22 @@
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.myapplication.midterm_section2.LoginFragment"
+        android:label="Login Fragment"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/navigateToPosts"
+            app:destination="@id/postsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postsFragment"
+        android:name="com.myapplication.midterm_section2.PostsFragment"
+        android:label="Posts Fragment"
+        tools:layout="@layout/fragment_posts" />
+</navigation>
