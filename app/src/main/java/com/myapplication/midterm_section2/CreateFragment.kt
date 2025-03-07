@@ -1,7 +1,9 @@
 package com.myapplication.midterm_section2
 
+
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,30 +11,35 @@ import android.view.ViewGroup
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.myapplication.midterm_section2.databinding.FragmentCreateBinding
 import com.myapplication.midterm_section2.model.Post
 import com.myapplication.midterm_section2.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.runBlocking
 
 private const val TAG = "CreateFragment"
 class CreateFragment : Fragment() {
-
     private var _binding: FragmentCreateBinding? = null
     private val binding get() = _binding!!
     private var photoUri : Uri? = null
     private var signedInUser: User? = null
     private lateinit var firestoreDb: FirebaseFirestore
+    private lateinit var createPostViewModel: CreatePostViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         Log.d("CreateFragment", "Selected URI")
         // Inflate the layout for this fragment
         _binding = FragmentCreateBinding.inflate(inflater, container, false)
         firestoreDb = FirebaseFirestore.getInstance()
+        createPostViewModel = ViewModelProvider(this)[CreatePostViewModel::class.java]
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 Log.d("CreateFragment", "Selected URI: $uri")
@@ -84,9 +91,20 @@ class CreateFragment : Fragment() {
     }
     private fun saveThePost() {
 
+        val imageAsString = convertUriToBase64(photoUri)
+
+        val fileName = "${System.currentTimeMillis()}-photo.jpg"
+
+        val job = runBlocking {
+            createPostViewModel
+                .uploadImageToGitHub(imageAsString, fileName)
+        }
+
+        val imageUrl = PhotoRepository.get().getImageUrl(fileName)
+
         val post = Post(
             binding.etDescription.text.toString(),
-            imageUrl = "",
+            imageUrl = imageUrl,
             System.currentTimeMillis(),
             signedInUser
         )
@@ -96,4 +114,10 @@ class CreateFragment : Fragment() {
         }
 
     }
+    fun convertUriToBase64(uri: Uri?): String {
+        val inputStream = context?.contentResolver?.openInputStream(uri!!)
+        val bytes = inputStream?.readBytes()
+        return Base64.encodeToString(bytes, Base64.DEFAULT)
+    }
+
 }
