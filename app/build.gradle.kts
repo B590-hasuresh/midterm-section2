@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.firebase.firestore.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,5 +57,5 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
     implementation("androidx.credentials:credentials:1.2.0")
     implementation("com.google.android.gms:play-services-auth:20.6.0")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.0.0")// Latest version
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.0.0")
 }
