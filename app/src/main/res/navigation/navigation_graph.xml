@@ -1,22 +1,33 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation_graph"
-    app:startDestination="@id/loginFragment">
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/navigation_graph"
+app:startDestination="@id/loginFragment">
 
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.myapplication.midterm_section2.LoginFragment"
-        android:label="Login Fragment"
-        tools:layout="@layout/fragment_login">
-        <action
-            android:id="@+id/navigateToPosts"
-            app:destination="@id/postsFragment" />
-    </fragment>
+<!-- Login Fragment -->
+<fragment
+    android:id="@+id/loginFragment"
+    android:name="com.myapplication.midterm_section2.LoginFragment"
+    android:label="Login Fragment"
+    tools:layout="@layout/fragment_login">
+    <action
+        android:id="@+id/navigateToPosts"
+        app:destination="@id/postsFragment" />
+</fragment>
 
-    <fragment
-        android:id="@+id/postsFragment"
-        android:name="com.myapplication.midterm_section2.PostsFragment"
-        android:label="Posts Fragment"
-        tools:layout="@layout/fragment_posts" />
+<!-- Posts Fragment -->
+<fragment
+    android:id="@+id/postsFragment"
+    android:name="com.myapplication.midterm_section2.PostsFragment"
+    android:label="Posts Fragment"
+    tools:layout="@layout/fragment_posts">
+
+    <!-- Action to navigate back to loginFragment when user logs out -->
+    <action
+        android:id="@+id/action_postsFragment_to_loginFragment"
+        app:destination="@id/loginFragment"
+        app:popUpTo="@id/loginFragment"
+        app:popUpToInclusive="true"/>
+</fragment>
+
 </navigation>

@@ -7,15 +7,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.auth.FirebaseAuth
 import com.myapplication.midterm_section2.databinding.FragmentLoginBinding
+import com.google.android.gms.auth.api.credentials.Credential
+import com.google.android.gms.auth.api.credentials.Credentials
+import com.google.android.gms.auth.api.credentials.CredentialsClient
+import com.google.android.gms.auth.api.credentials.CredentialRequest
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
+    private lateinit var credentialsClient: CredentialsClient  // Smart Lock Client
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,6 +30,7 @@ class LoginFragment : Fragment() {
     ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         auth = FirebaseAuth.getInstance()
+        credentialsClient = Credentials.getClient(requireContext()) // Initialize Smart Lock Client
 
         // If user is already logged in, go to Posts Screen
         if (auth.currentUser != null) {
@@ -51,13 +59,31 @@ class LoginFragment : Fragment() {
             .addOnCompleteListener { task ->
                 binding.btnLogin.isEnabled = true
                 if (task.isSuccessful) {
-                    Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show()
-                    goToPostsScreen()
+                    Log.d("LoginFragment", "Login successful!")
+
+                    // Save password prompt
+                    savePasswordWithGoogle(email, password)
+
+                    goToPostsScreen() // Navigate AFTER trying to save credentials
                 } else {
                     Log.e("LoginFragment", "signInWithEmail failed", task.exception)
                     Toast.makeText(context, "Authentication failed", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun savePasswordWithGoogle(email: String, password: String) {
+        val credential = Credential.Builder(email)
+            .setPassword(password)
+            .build()
+
+        credentialsClient.save(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("SmartLock", "Password saved successfully!")
+            } else {
+                Log.e("SmartLock", "Could not save password", task.exception)
+            }
+        }
     }
 
     private fun goToPostsScreen() {
